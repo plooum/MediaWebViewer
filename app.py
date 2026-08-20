@@ -458,7 +458,7 @@ HTML_TEMPLATE = """
             <h1>Solar Eclipse - August 12, 2026</h1>
         </div>
         
-        <p class="subtitle">Edouard LETAILLEUR</p>
+        <p class="subtitle">--</p>
         
         {% if has_zip or items %}
         <a href="/download-all" class="btn-zip" download="all.zip">
