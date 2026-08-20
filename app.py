@@ -21,7 +21,7 @@ HTML_TEMPLATE = """
     <title>Eclipse - August 12, 2026</title>
     
     <!-- FAVICON ECLIPSE (SVG Data URI) -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='42' fill='%23ffffff' filter='drop-shadow(0 0 8px %2338bdf8)'/><circle cx='46' cy='50' r='40' fill='%23090d16'/></svg>">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='42' fill='%23fef08a' filter='drop-shadow(0 0 8px %23eab308)'/><circle cx='46' cy='50' r='40' fill='%23090d16'/></svg>">
 
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -96,8 +96,8 @@ HTML_TEMPLATE = """
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            background: #ffffff; /* Le Soleil blanc fixe */
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.8), 0 0 40px rgba(226, 232, 240, 0.4);
+            background: #fef08a; /* Soleil jaune clair (#fef08a) */
+            box-shadow: 0 0 20px rgba(254, 240, 138, 0.9), 0 0 40px rgba(234, 179, 8, 0.5);
             position: relative;
             overflow: hidden;
         }
@@ -116,7 +116,7 @@ HTML_TEMPLATE = """
             animation: move-moon-to-center 5s ease-out forwards;
         }
 
-        /* La Couronne Solaire : Apparaît quand l'éclipse devient totale */
+        /* La Couronne Solaire : Dorée lors de la totalité */
         .eclipse-icon::after {
             content: '';
             position: absolute;
@@ -128,9 +128,9 @@ HTML_TEMPLATE = """
             pointer-events: none;
             z-index: 2;
             box-shadow: 
-                0 0 15px 3px rgba(255, 255, 255, 0.9),
-                0 0 30px 8px rgba(56, 189, 248, 0.6),
-                0 0 50px 15px rgba(148, 163, 184, 0.4);
+                0 0 15px 3px rgba(254, 240, 138, 0.9),
+                0 0 30px 8px rgba(234, 179, 8, 0.7),
+                0 0 50px 15px rgba(202, 138, 4, 0.4);
             opacity: 0;
             animation: corona-appear 5s ease-out forwards;
         }
