@@ -19,6 +19,10 @@ HTML_TEMPLATE = """
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Eclipse - August 12, 2026</title>
+    
+    <!-- FAVICON ECLIPSE (SVG Data URI) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='42' fill='%23ffffff' filter='drop-shadow(0 0 8px %2338bdf8)'/><circle cx='46' cy='50' r='40' fill='%23090d16'/></svg>">
+
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -64,17 +68,66 @@ HTML_TEMPLATE = """
             text-align: center;
         }
 
+        /* --- ECLIPSE ANIMATED ICON --- */
         .eclipse-icon {
             width: 70px;
             height: 70px;
             border-radius: 50%;
-            background: #090d16;
-            box-shadow: 
-                0 0 20px 2px rgba(226, 232, 240, 0.6),
-                0 0 50px 10px rgba(148, 163, 184, 0.3),
-                inset -4px -4px 10px rgba(255, 255, 255, 0.2);
+            background: #ffffff; /* Le Soleil blanc fixe */
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.8), 0 0 40px rgba(226, 232, 240, 0.4);
             margin-bottom: 8px;
             position: relative;
+            overflow: hidden;
+        }
+
+        /* La Lune : Disque sombre (#090d16) arrivant par la droite */
+        .eclipse-icon::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: #090d16;
+            /* Animation unique de 5s se bloquant au centre */
+            animation: move-moon-to-center 5s ease-out forwards;
+        }
+
+        /* La Couronne Solaire : Apparaît quand l'éclipse devient totale */
+        .eclipse-icon::after {
+            content: '';
+            position: absolute;
+            top: -5%;
+            left: -5%;
+            width: 110%;
+            height: 110%;
+            border-radius: 50%;
+            pointer-events: none;
+            box-shadow: 
+                0 0 15px 3px rgba(255, 255, 255, 0.9),
+                0 0 30px 8px rgba(56, 189, 248, 0.6),
+                0 0 50px 15px rgba(148, 163, 184, 0.4);
+            opacity: 0;
+            animation: corona-appear 5s ease-out forwards;
+        }
+
+        @keyframes move-moon-to-center {
+            0% {
+                transform: translateX(105%) scale(0.98);
+            }
+            100% {
+                transform: translateX(0%) scale(1);
+            }
+        }
+
+        @keyframes corona-appear {
+            0%, 60% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
         }
 
         h1 { 
@@ -231,6 +284,7 @@ HTML_TEMPLATE = """
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.3s ease;
+            user-select: none;
         }
 
         .lightbox-overlay.active {
@@ -281,6 +335,30 @@ HTML_TEMPLATE = """
             color: #38bdf8;
         }
 
+        .lightbox-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(15, 23, 42, 0.6);
+            color: #f8fafc;
+            border: 1px solid rgba(226, 232, 240, 0.2);
+            font-size: 1.8rem;
+            padding: 15px 12px;
+            cursor: pointer;
+            z-index: 1005;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(4px);
+        }
+
+        .lightbox-btn:hover {
+            background: rgba(56, 189, 248, 0.8);
+            color: #0f172a;
+        }
+
+        .lightbox-btn.prev { left: 15px; }
+        .lightbox-btn.next { right: 15px; }
+
         .lightbox-caption {
             position: absolute;
             bottom: 0;
@@ -315,7 +393,7 @@ HTML_TEMPLATE = """
         <div class="card">
             <div class="media-container">
                 {% if item.type == 'image' %}
-                    <img src="/media/{{ item.name }}" alt="{{ item.name }}" loading="lazy" onclick="openLightbox('/media/{{ item.name }}', '{{ item.name }}')">
+                    <img src="/media/{{ item.name }}" alt="{{ item.name }}" loading="lazy" onclick="openLightbox('{{ item.name }}')">
                 {% elif item.type == 'video' %}
                     <video controls preload="metadata">
                         <source src="/media/{{ item.name }}">
@@ -336,6 +414,8 @@ HTML_TEMPLATE = """
     <!-- LIGHTBOX MODAL -->
     <div class="lightbox-overlay" id="lightbox" onclick="closeLightbox(event)">
         <span class="lightbox-close" onclick="closeLightbox(event)">&times;</span>
+        <button class="lightbox-btn prev" onclick="prevImage(event)">&#10094;</button>
+        <button class="lightbox-btn next" onclick="nextImage(event)">&#10095;</button>
         <div class="lightbox-content" onclick="event.stopPropagation()">
             <img src="" alt="" class="lightbox-img" id="lightbox-img">
             <div class="lightbox-caption" id="lightbox-caption"></div>
@@ -343,29 +423,85 @@ HTML_TEMPLATE = """
     </div>
 
     <script>
-        function openLightbox(src, filename) {
+        const imageList = [
+            {% for item in items if item.type == 'image' %}
+                "{{ item.name }}"{% if not loop.last %},{% endif %}
+            {% endfor %}
+        ];
+
+        let currentIndex = -1;
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        function openLightbox(filename) {
+            currentIndex = imageList.indexOf(filename);
+            if (currentIndex === -1) return;
+
+            updateLightbox();
+
             const lightbox = document.getElementById('lightbox');
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function updateLightbox() {
+            if (currentIndex < 0 || currentIndex >= imageList.length) return;
+            const filename = imageList[currentIndex];
             const img = document.getElementById('lightbox-img');
             const caption = document.getElementById('lightbox-caption');
 
-            img.src = src;
+            img.src = '/media/' + filename;
             caption.textContent = filename;
-            lightbox.classList.add('active');
-            document.body.style.overflow = 'hidden'; // Empêche le défilement de la page
         }
 
         function closeLightbox(event) {
             const lightbox = document.getElementById('lightbox');
             lightbox.classList.remove('active');
-            document.body.style.overflow = 'auto'; // Rétablit le défilement
+            document.body.style.overflow = 'auto';
         }
 
-        // Fermer la lightbox avec la touche Échap (Escape)
+        function prevImage(event) {
+            if (event) event.stopPropagation();
+            if (imageList.length === 0) return;
+            currentIndex = (currentIndex - 1 + imageList.length) % imageList.length;
+            updateLightbox();
+        }
+
+        function nextImage(event) {
+            if (event) event.stopPropagation();
+            if (imageList.length === 0) return;
+            currentIndex = (currentIndex + 1) % imageList.length;
+            updateLightbox();
+        }
+
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeLightbox();
-            }
+            const lightbox = document.getElementById('lightbox');
+            if (!lightbox.classList.contains('active')) return;
+
+            if (e.key === 'Escape') closeLightbox();
+            else if (e.key === 'ArrowLeft') prevImage();
+            else if (e.key === 'ArrowRight') nextImage();
         });
+
+        const lightboxOverlay = document.getElementById('lightbox');
+
+        lightboxOverlay.addEventListener('touchstart', function(e) {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        lightboxOverlay.addEventListener('touchend', function(e) {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, { passive: true });
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            if (touchEndX < touchStartX - swipeThreshold) {
+                nextImage();
+            } else if (touchEndX > touchStartX + swipeThreshold) {
+                prevImage();
+            }
+        }
     </script>
 </body>
 </html>
@@ -413,7 +549,6 @@ def download_all():
     """Downloads all.zip if present, or creates it on-the-fly from available media files."""
     zip_path = os.path.join(MEDIA_FOLDER, "all.zip")
 
-    # If all.zip does not exist, create it dynamically
     if not os.path.exists(zip_path):
         media_files = get_media_files()
         if not media_files:
