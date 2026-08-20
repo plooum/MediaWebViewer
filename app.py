@@ -82,6 +82,13 @@ HTML_TEMPLATE = """
             width: 60px;
             height: 60px;
             flex-shrink: 0;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.2s ease;
+        }
+
+        .eclipse-wrapper:hover {
+            transform: scale(1.08);
         }
 
         /* --- ECLIPSE ANIMATED ICON --- */
@@ -106,7 +113,6 @@ HTML_TEMPLATE = """
             border-radius: 50%;
             background: #090d16;
             z-index: 1;
-            /* Animation unique de 5s se bloquant au centre */
             animation: move-moon-to-center 5s ease-out forwards;
         }
 
@@ -440,7 +446,7 @@ HTML_TEMPLATE = """
 
     <div class="header">
         <div class="title-container">
-            <div class="eclipse-wrapper">
+            <div class="eclipse-wrapper" id="eclipse-wrapper" onclick="restartEclipseAnimation()" title="Recliquer pour relancer l'animation">
                 <div class="eclipse-icon"></div>
                 <div class="clouds-overlay">
                     <svg viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -496,6 +502,12 @@ HTML_TEMPLATE = """
     </div>
 
     <script>
+        function restartEclipseAnimation() {
+            const wrapper = document.getElementById('eclipse-wrapper');
+            const clone = wrapper.cloneNode(true);
+            wrapper.parentNode.replaceChild(clone, wrapper);
+        }
+
         const imageList = [
             {% for item in items if item.type == 'image' %}
                 "{{ item.name }}"{% if not loop.last %},{% endif %}
