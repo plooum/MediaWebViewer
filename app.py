@@ -68,14 +68,21 @@ HTML_TEMPLATE = """
             text-align: center;
         }
 
-        /* --- ECLIPSE ANIMATED ICON --- */
-        .eclipse-icon {
+        /* Conteneur principal de l'icône d'éclipse */
+        .eclipse-wrapper {
+            position: relative;
             width: 70px;
             height: 70px;
+            margin-bottom: 8px;
+        }
+
+        /* --- ECLIPSE ANIMATED ICON --- */
+        .eclipse-icon {
+            width: 100%;
+            height: 100%;
             border-radius: 50%;
             background: #ffffff; /* Le Soleil blanc fixe */
             box-shadow: 0 0 20px rgba(255, 255, 255, 0.8), 0 0 40px rgba(226, 232, 240, 0.4);
-            margin-bottom: 8px;
             position: relative;
             overflow: hidden;
         }
@@ -90,6 +97,7 @@ HTML_TEMPLATE = """
             height: 100%;
             border-radius: 50%;
             background: #090d16;
+            z-index: 1;
             /* Animation unique de 5s se bloquant au centre */
             animation: move-moon-to-center 5s ease-out forwards;
         }
@@ -104,12 +112,33 @@ HTML_TEMPLATE = """
             height: 110%;
             border-radius: 50%;
             pointer-events: none;
+            z-index: 2;
             box-shadow: 
                 0 0 15px 3px rgba(255, 255, 255, 0.9),
                 0 0 30px 8px rgba(56, 189, 248, 0.6),
                 0 0 50px 15px rgba(148, 163, 184, 0.4);
             opacity: 0;
             animation: corona-appear 5s ease-out forwards;
+        }
+
+        /* Nuages plus grands débordant de l'icône d'éclipse */
+        .clouds-overlay {
+            position: absolute;
+            top: -15px;
+            left: -20px;
+            width: 110px;
+            height: 100px;
+            z-index: 10;
+            pointer-events: none;
+            opacity: 0;
+            transform: translateX(-15%);
+            animation: clouds-appear 5s ease-out forwards;
+        }
+
+        .clouds-overlay svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
         }
 
         @keyframes move-moon-to-center {
@@ -127,6 +156,18 @@ HTML_TEMPLATE = """
             }
             100% {
                 opacity: 1;
+            }
+        }
+
+        /* Apparition et défilement doux des nuages au moment de la totalité */
+        @keyframes clouds-appear {
+            0%, 60% {
+                opacity: 0;
+                transform: translateX(-25%);
+            }
+            100% {
+                opacity: 0.85;
+                transform: translateX(0%);
             }
         }
 
@@ -377,9 +418,19 @@ HTML_TEMPLATE = """
     <div class="cloud-bg"></div>
 
     <div class="header">
-        <div class="eclipse-icon"></div>
+        <div class="eclipse-wrapper">
+            <div class="eclipse-icon"></div>
+            <div class="clouds-overlay">
+                <svg viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Premier nuage plus grand -->
+                    <path d="M10 65 C15 45, 38 42, 48 55 C55 42, 78 40, 85 55 C98 48, 115 58, 108 75 C100 88, 15 88, 10 65 Z" fill="rgba(203, 213, 225, 0.5)" filter="blur(2px)"/>
+                    <!-- Second nuage en superposition -->
+                    <path d="M-5 45 C5 28, 25 30, 32 40 C40 26, 62 28, 68 40 C78 32, 95 42, 88 58 C10 65, 0 55, -5 45 Z" fill="rgba(148, 163, 184, 0.4)" filter="blur(3px)"/>
+                </svg>
+            </div>
+        </div>
         <h1>Solar Eclipse - August 12, 2026</h1>
-        <p class="subtitle">--</p>
+        <p class="subtitle">Edouard LETAILLEUR</p>
         
         {% if has_zip or items %}
         <a href="/download-all" class="btn-zip" download="all.zip">
