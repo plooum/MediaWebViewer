@@ -102,7 +102,7 @@ HTML_TEMPLATE = """
             overflow: hidden;
         }
 
-        /* La Lune : Disque sombre (#090d16) arrivant par la droite */
+        /* La Lune : Ralentissement marqué en approchant du centre (cubic-bezier) */
         .eclipse-icon::before {
             content: '';
             position: absolute;
@@ -113,7 +113,7 @@ HTML_TEMPLATE = """
             border-radius: 50%;
             background: #090d16;
             z-index: 1;
-            animation: move-moon-to-center 5s ease-out forwards;
+            animation: move-moon-to-center 6s cubic-bezier(0.1, 0.7, 0.1, 1) forwards;
         }
 
         /* La Couronne Solaire : Dorée lors de la totalité */
@@ -132,7 +132,7 @@ HTML_TEMPLATE = """
                 0 0 30px 8px rgba(234, 179, 8, 0.7),
                 0 0 50px 15px rgba(202, 138, 4, 0.4);
             opacity: 0;
-            animation: corona-appear 5s ease-out forwards;
+            animation: corona-appear 6s cubic-bezier(0.1, 0.7, 0.1, 1) forwards;
         }
 
         /* Nuages plus grands débordant de l'icône d'éclipse */
@@ -146,7 +146,7 @@ HTML_TEMPLATE = """
             pointer-events: none;
             opacity: 0;
             transform: translateX(-15%);
-            animation: clouds-appear 5s ease-out forwards;
+            animation: clouds-appear 6s cubic-bezier(0.1, 0.7, 0.1, 1) forwards;
         }
 
         .clouds-overlay svg {
@@ -165,7 +165,7 @@ HTML_TEMPLATE = """
         }
 
         @keyframes corona-appear {
-            0%, 60% {
+            0%, 70% {
                 opacity: 0;
             }
             100% {
@@ -175,7 +175,7 @@ HTML_TEMPLATE = """
 
         /* Apparition et défilement doux des nuages au moment de la totalité */
         @keyframes clouds-appear {
-            0%, 60% {
+            0%, 70% {
                 opacity: 0;
                 transform: translateX(-25%);
             }
