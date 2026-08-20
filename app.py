@@ -63,17 +63,25 @@ HTML_TEMPLATE = """
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 12px;
+            gap: 16px;
             margin-bottom: 40px;
             text-align: center;
+        }
+
+        /* Conteneur Titre + Icône côte à côte */
+        .title-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
         }
 
         /* Conteneur principal de l'icône d'éclipse */
         .eclipse-wrapper {
             position: relative;
-            width: 70px;
-            height: 70px;
-            margin-bottom: 8px;
+            width: 60px;
+            height: 60px;
+            flex-shrink: 0;
         }
 
         /* --- ECLIPSE ANIMATED ICON --- */
@@ -124,10 +132,10 @@ HTML_TEMPLATE = """
         /* Nuages plus grands débordant de l'icône d'éclipse */
         .clouds-overlay {
             position: absolute;
-            top: -15px;
-            left: -20px;
-            width: 110px;
-            height: 100px;
+            top: -12px;
+            left: -18px;
+            width: 95px;
+            height: 85px;
             z-index: 10;
             pointer-events: none;
             opacity: 0;
@@ -177,6 +185,7 @@ HTML_TEMPLATE = """
             font-weight: 700;
             letter-spacing: -0.02em;
             text-shadow: 0 0 20px rgba(241, 245, 249, 0.3);
+            text-align: left;
         }
 
         .subtitle {
@@ -187,7 +196,7 @@ HTML_TEMPLATE = """
         }
 
         .btn-zip {
-            margin-top: 10px;
+            margin-top: 5px;
             display: inline-flex;
             align-items: center;
             gap: 10px;
@@ -207,6 +216,18 @@ HTML_TEMPLATE = """
             border-color: rgba(226, 232, 240, 0.5);
             box-shadow: 0 6px 25px rgba(0, 0, 0, 0.6), 0 0 20px rgba(226, 232, 240, 0.25);
             transform: translateY(-2px); 
+        }
+
+        /* Responsive design pour les petits écrans */
+        @media (max-width: 640px) {
+            .title-container {
+                flex-direction: column;
+                gap: 12px;
+            }
+            h1 {
+                text-align: center;
+                font-size: 1.8rem;
+            }
         }
 
         .grid { 
@@ -418,18 +439,19 @@ HTML_TEMPLATE = """
     <div class="cloud-bg"></div>
 
     <div class="header">
-        <div class="eclipse-wrapper">
-            <div class="eclipse-icon"></div>
-            <div class="clouds-overlay">
-                <svg viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Premier nuage plus grand -->
-                    <path d="M10 65 C15 45, 38 42, 48 55 C55 42, 78 40, 85 55 C98 48, 115 58, 108 75 C100 88, 15 88, 10 65 Z" fill="rgba(203, 213, 225, 0.5)" filter="blur(2px)"/>
-                    <!-- Second nuage en superposition -->
-                    <path d="M-5 45 C5 28, 25 30, 32 40 C40 26, 62 28, 68 40 C78 32, 95 42, 88 58 C10 65, 0 55, -5 45 Z" fill="rgba(148, 163, 184, 0.4)" filter="blur(3px)"/>
-                </svg>
+        <div class="title-container">
+            <div class="eclipse-wrapper">
+                <div class="eclipse-icon"></div>
+                <div class="clouds-overlay">
+                    <svg viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 65 C15 45, 38 42, 48 55 C55 42, 78 40, 85 55 C98 48, 115 58, 108 75 C100 88, 15 88, 10 65 Z" fill="rgba(203, 213, 225, 0.5)" filter="blur(2px)"/>
+                        <path d="M-5 45 C5 28, 25 30, 32 40 C40 26, 62 28, 68 40 C78 32, 95 42, 88 58 C10 65, 0 55, -5 45 Z" fill="rgba(148, 163, 184, 0.4)" filter="blur(3px)"/>
+                    </svg>
+                </div>
             </div>
+            <h1>Solar Eclipse - August 12, 2026</h1>
         </div>
-        <h1>Solar Eclipse - August 12, 2026</h1>
+        
         <p class="subtitle">Edouard LETAILLEUR</p>
         
         {% if has_zip or items %}
